@@ -20,8 +20,10 @@ router.post("/signup", (req, res, next) => {
   });
 
   User.register(user, password, err => {
-    next(err)
-    res.json({ success: true });
+    if (err)
+      next(err);
+    else
+      res.json({ success: true });
   });
 });
 

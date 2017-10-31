@@ -66,45 +66,6 @@ passport.use(strategy);
 passport.serializeUser((user, done) => done(null, user))
 passport.deserializeUser((user, done) => done(null, user))
 
-passport.use(new FacebookStrategy({
-  clientID: process.env.FB_CLIENT_ID,
-  clientSecret: process.env.FB_CLIENT_SECRET,
-  // TODO replace by real url in server
-  callbackURL: "http://localhost:3000/api/login/facebook/callback"
-}, (accessToken, refreshToken, profile, done) => {
-  console.log('Logging in with Facebook')
-  console.log('accessToken', accessToken)
-  console.log('refreshToken', refreshToken)
-  console.log('profile', profile)
-  // check if the user is already created
-  User.findOne({
-    'facebook.id': profile.id
-  }).then(user => {
-    if (user) return done(null, user)
-    // Let's register as a new user
-    user = new User({
-      facebook: {
-        id: profile.id,
-        // the accessToken is needed if you want to access extra information on the user
-        // In that case we may want to store it
-        // we could save more information if we want to
-        accessToken
-      },
-      // make up an username because we need it
-      username: `fb__${profile.id}`,
-      name: profile.displayName
-    });
-
-    User.register(user, "We don't need a password", err => {
-      if (err) {
-        done(err, null)
-      } else {
-        done(null, user)
-      }
-    });
-  }).catch(err => done(err))
-}));
-
 const authRoutes = require("./routes/auth");
 
 // We populate ourselves req.user because we don't want to
